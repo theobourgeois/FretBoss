@@ -73,8 +73,7 @@ function App() {
                         }}
                         className="text-lg"
                     >
-                        A tool to help you learn the notes on the guitar
-                        fretboard.
+                        A tool to help you master the fretboard
                     </p>
                 </div>
                 <div className="flex flex-col items-center gap-2">
