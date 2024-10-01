@@ -6,7 +6,7 @@ import {
 import { GameMode } from "./components/game-mode";
 
 function App() {
-    const { gameMode, setGameMode } = useGuitarState();
+    const { gameMode, setGameMode, setNotes, setGuesses } = useGuitarState();
 
     return (
         <div
@@ -46,9 +46,11 @@ function App() {
                         </p>
                         <select
                             className="bg-gradient-to-t mt-2 w-max from-white to-slate-200 font-semibold text-black px-4 py-2 rounded-lg"
-                            onChange={(e) =>
-                                setGameMode(e.target.value as GameModeType)
-                            }
+                            onChange={(e) => {
+                                setGameMode(e.target.value as GameModeType);
+                                setGuesses([]);
+                                setNotes([]);
+                            }}
                             value={gameMode}
                         >
                             <option value="place">Place notes</option>
