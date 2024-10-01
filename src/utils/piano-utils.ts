@@ -120,24 +120,42 @@ export function getNoteFromFrequency(frequency: number) {
   };
 }
 
-type GuitarNote = {
+export type GuitarNote = {
   fret: number;
   string: number;
 }
 
+export type GameMode = "place" | "guess";
+
 type GuitarStateStore = {
+  gameMode: GameMode;
+  setGameMode: (mode: GameMode) => void;
+
+  // place mode
   notes: number[];
   setNotes: (notes: number[]) => void;
   guesses: GuitarNote[];
   setGuesses: (guesses: GuitarNote[]) => void;
   noteBeingGuessed: Note | null;
   setNoteBeingGuessed: (note: Note) => void;
+
+  // guess mode
+  notesGuessed: Note[];
+  setNotesGuessed: (notes: Note[]) => void;
+  notesToGuess: GuitarNote[];
+  setNotesToGuess: (notes: GuitarNote[]) => void;
 };
 
 export const useGuitarStore = create<GuitarStateStore>((set) => ({
+  gameMode: "place",
+  setGameMode: (mode) => set({ gameMode: mode }),
   notes: [],
+  notesToGuess: [],
   guesses: [],
+  notesGuessed: [],
   noteBeingGuessed: null,
+  setNotesGuessed: (notes) => set({ notesGuessed: notes }),
+  setNotesToGuess: (notes) => set({ notesToGuess: notes }),
   setNoteBeingGuessed: (note) => set({ noteBeingGuessed: note }),
   setNotes: (notes) => set({ notes }),
   setGuesses: (guesses) => set({ guesses }),

@@ -9,34 +9,30 @@ import {
 } from "../utils/piano-utils";
 import { twMerge } from "tailwind-merge";
 
-function GuitarNote({ fret, string }: { fret: number; string: number }) {
+function GuitarNoteComp({
+    fret,
+    string,
+    onClick,
+    isShowing,
+    isError,
+    hideNoteText = false,
+    onChange,
+}: {
+    fret: number;
+    string: number;
+    onClick?: () => void;
+    isShowing: boolean;
+    hideNoteText?: boolean;
+    isError: boolean;
+    onChange?: (value: string) => void;
+}) {
     const note = getNoteFromFretAndString(fret, string);
-    // console.log(note, fret, string);
-    const {
-        notes: noteFrequencies,
-        setGuesses,
-        guesses,
-        noteBeingGuessed,
-    } = useGuitarState();
-
-    const notes = noteFrequencies.map((frequency) => {
-        const note = getNoteFromFrequency(frequency);
-        return note;
-    });
-    const [isHovering, setIsHovering] = useState(false);
-
-    const isGuessed = guesses.some(
-        (n) => n.fret === fret && n.string === string
-    );
-
-    const isHighlighted = notes.some(
-        (n) => n.note === note.note && n.octave === note.octave
-    );
     const isDoubleDotted = fret + 1 == 12 && (string === 1 || string === 5);
     const isDotted = isDoubleDotted
         ? true
         : DOTTED_FRETS.includes(fret + 1) && string === 3;
-    const isGuessCorrect = isGuessed && noteBeingGuessed === note.note;
+
+    const [isHovering, setIsHovering] = useState(false);
 
     const handleMouseEnter = () => {
         setIsHovering(true);
@@ -44,16 +40,6 @@ function GuitarNote({ fret, string }: { fret: number; string: number }) {
 
     const handleMouseLeave = () => {
         setIsHovering(false);
-    };
-
-    const handleGuess = () => {
-        if (isGuessed) {
-            setGuesses(
-                guesses.filter((n) => n.fret !== fret || n.string !== string)
-            );
-            return;
-        }
-        setGuesses([...guesses, { fret, string }]);
     };
 
     return (
@@ -64,7 +50,7 @@ function GuitarNote({ fret, string }: { fret: number; string: number }) {
             className="relative cursor-pointer z-[100]"
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
-            onClick={handleGuess}
+            onClick={onClick}
         >
             {isDotted && (
                 <div
@@ -81,19 +67,25 @@ function GuitarNote({ fret, string }: { fret: number; string: number }) {
                     className="absolute"
                 ></div>
             )}
-            {(isHighlighted || isGuessed) && (
+            {isShowing && (
                 <div
                     className={twMerge(
                         "z-10 w-8 h-8 top-[9px] left-[55%] -translate-x-1/2 absolute rounded-full flex justify-center items-center",
-                        isGuessCorrect ? "bg-green-500" : "bg-red-500"
+                        isError ? "bg-red-500" : "bg-green-500"
                     )}
                 >
-                    {/* {(isGuessCorrect || isHighlighted) && ( */}
-                    <p>
-                        {note.note}
-                        {note.octave}
-                    </p>
-                    {/* )} */}
+                    {!hideNoteText && (
+                        <p>
+                            {note.note}
+                            {note.octave}
+                        </p>
+                    )}
+                    {hideNoteText && onChange && (
+                        <input
+                            className="w-8 h-8 bg-transparent absolute top-0 left-0"
+                            onChange={(e) => onChange(e.target.value)}
+                        />
+                    )}
                 </div>
             )}
             {isHovering && (
@@ -106,6 +98,82 @@ function GuitarNote({ fret, string }: { fret: number; string: number }) {
             )}
         </div>
     );
+}
+function GuitarNote({ fret, string }: { fret: number; string: number }) {
+    const note = getNoteFromFretAndString(fret, string);
+    const {
+        notes: noteFrequencies,
+        setGuesses,
+        guesses,
+        noteBeingGuessed,
+        gameMode,
+        notesToGuess,
+    } = useGuitarState();
+
+    switch (gameMode) {
+        case "place": {
+            const notes = noteFrequencies.map((frequency) => {
+                const note = getNoteFromFrequency(frequency);
+                return note;
+            });
+
+            const isGuessed = guesses.some(
+                (n) => n.fret === fret && n.string === string
+            );
+
+            const isHighlighted = notes.some(
+                (n) => n.note === note.note && n.octave === note.octave
+            );
+            const isGuessCorrect = isGuessed && noteBeingGuessed === note.note;
+
+            const handleGuess = () => {
+                if (isGuessed) {
+                    setGuesses(
+                        guesses.filter(
+                            (n) => n.fret !== fret || n.string !== string
+                        )
+                    );
+                    return;
+                }
+                setGuesses([...guesses, { fret, string }]);
+            };
+
+            return (
+                <GuitarNoteComp
+                    fret={fret}
+                    string={string}
+                    onClick={handleGuess}
+                    isShowing={isHighlighted || isGuessed}
+                    isError={!isGuessCorrect}
+                />
+            );
+        }
+        case "guess": {
+            const isGuessedCorrectly = guesses.some(
+                (n) => n.fret === fret && n.string === string
+            );
+            const isHighlighted = notesToGuess.some(
+                (n) => n.fret === fret && n.string === string
+            );
+
+            const handleChange = (value: string) => {
+                if (value.toUpperCase() === note.note.toUpperCase()) {
+                    setGuesses([...guesses, { fret, string }]);
+                }
+            };
+
+            return (
+                <GuitarNoteComp
+                    fret={fret}
+                    string={string}
+                    isShowing={isHighlighted}
+                    onChange={handleChange}
+                    isError={!isGuessedCorrectly}
+                    hideNoteText={!isGuessedCorrectly}
+                />
+            );
+        }
+    }
 }
 
 export function Guitar() {
