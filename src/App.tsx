@@ -4,8 +4,13 @@ import { getNoteFrequency, Note, useGuitarState } from "./utils/piano-utils";
 import { FaRandom } from "react-icons/fa";
 
 function App() {
-    const { setNotes, setGuesses, noteBeingGuessed, setNoteBeingGuessed } =
-        useGuitarState();
+    const {
+        setNotes,
+        notes,
+        setGuesses,
+        noteBeingGuessed,
+        setNoteBeingGuessed,
+    } = useGuitarState();
 
     useEffect(() => {
         handleSelectRandomNote();
@@ -26,6 +31,12 @@ function App() {
 
     const handleSubmit = () => {
         if (!noteBeingGuessed) return;
+
+        if (notes.length > 0) {
+            setNotes([]);
+            return;
+        }
+
         const freqs = [3, 4, 5, 6, 7].map((octave) =>
             getNoteFrequency(noteBeingGuessed, octave)
         );
@@ -97,7 +108,7 @@ function App() {
                             className="bg-gradient-to-t  font-semibold text-black px-4 py-2 rounded-lg"
                             onClick={handleSubmit}
                         >
-                            Reveal notes
+                            {notes.length === 0 ? "Reveal" : "Hide"} notes
                         </button>
                     </div>
                 </div>
