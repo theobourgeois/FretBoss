@@ -71,9 +71,9 @@ function App() {
                         style={{
                             color: "#ede8d0",
                         }}
-                        className="text-lg"
+                        className="text-lg text-center"
                     >
-                        A tool to help you master the fretboard
+                        A tool to help you master the fretboard.
                     </p>
                 </div>
                 <div className="flex flex-col items-center gap-2">

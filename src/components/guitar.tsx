@@ -169,10 +169,11 @@ export function Guitar() {
                             <div
                                 style={{
                                     background:
-                                        "linear-gradient(0deg, #b0b0b0, #d0d0d0, #f0f0f0, #d0d0d0, #b0b0b0)",
+                                        "linear-gradient(0deg, #444444, #909090, #d0d0d0, #909090, #444444)",
                                     boxShadow: "0 0 5px 5px #00000010",
+                                    height: string >= 3 ? "6px" : "4px",
                                 }}
-                                className="absolute h-1 top-6 w-full"
+                                className="absolute  top-6 w-full"
                             ></div>
                         </div>
                     ))}
