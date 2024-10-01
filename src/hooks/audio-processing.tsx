@@ -13,9 +13,6 @@ export function useAudioProcessing() {
         null
     );
     const [error, setError] = useState<string | null>(null);
-    const [audioData, setAudioData] = useState<Float32Array>(
-        new Float32Array(analyserNode.fftSize)
-    );
     const [fftData, setFftData] = useState<Float32Array>(
         new Float32Array(analyserNode.fftSize)
     );
@@ -66,7 +63,6 @@ export function useAudioProcessing() {
                             analyserNode.fftSize
                         );
                         analyserNode.getFloatFrequencyData(newAudioData);
-                        setAudioData(newAudioData);
 
                         const timeDomainData = new Float32Array(
                             analyserNode.fftSize
