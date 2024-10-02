@@ -134,7 +134,11 @@ export type GuitarNote = {
   string: number;
 }
 
-export type GameMode = "place" | "guess";
+export type GameMode = "place" | "guess" | "interval1";
+type IntervalData = {
+  interval: number;
+  note: Note;
+}
 
 type GuitarStateStore = {
   gameMode: GameMode;
@@ -144,6 +148,7 @@ type GuitarStateStore = {
   notes: number[];
   setNotes: (notes: number[]) => void;
   guesses: GuitarNote[];
+
   setGuesses: (guesses: GuitarNote[]) => void;
   noteBeingGuessed: Note | null;
   setNoteBeingGuessed: (note: Note) => void;
@@ -153,11 +158,21 @@ type GuitarStateStore = {
   setNotesGuessed: (notes: Note[]) => void;
   notesToGuess: GuitarNote[];
   setNotesToGuess: (notes: GuitarNote[]) => void;
+
+  // interval mode 1
+  intervalData: IntervalData;
+  setIntervalData: (data: IntervalData) => void;
 };
 
 export const useGuitarStore = create<GuitarStateStore>((set) => ({
   gameMode: "guess",
   setGameMode: (mode) => set({ gameMode: mode }),
+  intervalData: {
+    interval: 5,
+    note: Note.C,
+  },
+  setIntervalData: (data) => set({ intervalData: data }),
+
   notes: [],
   notesToGuess: [],
   guesses: [],

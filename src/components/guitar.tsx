@@ -112,6 +112,7 @@ function GuitarNote({ fret, string }: { fret: number; string: number }) {
     } = useGuitarState();
 
     switch (gameMode) {
+        default:
         case "place": {
             const notes = noteFrequencies.map((frequency) => {
                 const note = getNoteFromFrequency(frequency);

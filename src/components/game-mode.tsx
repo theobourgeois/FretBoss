@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import {
+    addSemitoneToNote,
     getNoteFrequency,
     GuitarNote,
     Note,
@@ -21,6 +22,16 @@ const playNote = (randomNote: Note | null) => {
     oscillator.stop(audioContext.currentTime + 0.5);
 };
 
+const getRandomNote = (noteBeingGuessed: Note | null) => {
+    const notesList = Object.values(Note);
+    let randomNote = notesList[Math.floor(Math.random() * notesList.length)];
+    while (randomNote === noteBeingGuessed) {
+        randomNote = notesList[Math.floor(Math.random() * notesList.length)];
+    }
+
+    return randomNote;
+};
+
 export function GameMode() {
     const {
         gameMode,
@@ -31,8 +42,11 @@ export function GameMode() {
         setGuesses,
         setNotesToGuess,
         notesToGuess,
+        intervalData,
+        setIntervalData,
     } = useGuitarState();
     const [numberOfNotesToGuess, setNumberOfNotesToGuess] = useState(5);
+    const [setInterval, setSetInterval] = useState<number | null>(5);
 
     useEffect(() => {
         handleSelectRandomFretAndString();
@@ -60,13 +74,7 @@ export function GameMode() {
     };
 
     const handleSelectRandomNote = () => {
-        const notesList = Object.values(Note);
-        let randomNote =
-            notesList[Math.floor(Math.random() * notesList.length)];
-        while (randomNote === noteBeingGuessed) {
-            randomNote =
-                notesList[Math.floor(Math.random() * notesList.length)];
-        }
+        const randomNote = getRandomNote(noteBeingGuessed);
         setNoteBeingGuessed(randomNote);
         setGuesses([]);
         setNotes([]);
@@ -177,6 +185,107 @@ export function GameMode() {
                     >
                         {notes.length === 0 ? "Reveal" : "Hide"} notes
                     </button>
+                </div>
+            );
+        }
+        case "interval1": {
+            const handleSubmit = (e: React.FormEvent) => {
+                e.preventDefault();
+                const form = e.target as HTMLFormElement;
+                const formData = new FormData(form);
+                const note = formData.get("note") as Note;
+                const correctNote = addSemitoneToNote(
+                    intervalData.note,
+                    4,
+                    5
+                ).note;
+
+                if (note.toLowerCase() === correctNote.toLowerCase()) {
+                    alert("Correct!");
+                    const randomNote = getRandomNote(note);
+                    const newInterval = setInterval
+                        ? setInterval
+                        : Math.floor(Math.random() * 12) + 1;
+
+                    setIntervalData({
+                        note: randomNote,
+                        interval: newInterval,
+                    });
+                } else {
+                    alert("Incorrect!");
+                }
+            };
+
+            return (
+                <div className="flex flex-col items-center  gap-2">
+                    <div className="text-white text-2xl">
+                        <p className="flex items-center gap-2">
+                            Note:{" "}
+                            <span className="font-extrabold text-5xl">
+                                {intervalData.note.toUpperCase()}
+                            </span>
+                        </p>
+                        <p className="flex items-center gap-2">
+                            Interval:{" "}
+                            <span className="font-extrabold text-5xl">
+                                {intervalData.interval}
+                            </span>
+                        </p>
+                    </div>
+                    <form
+                        onSubmit={handleSubmit}
+                        className="flex flex-col gap-2"
+                    >
+                        <div className="flex flex-col gap-1">
+                            <label
+                                className="text-white"
+                                htmlFor="numberOfNotesToGuess"
+                            >
+                                Select interval to guess
+                            </label>
+                            <select
+                                name="interval"
+                                className="rounded-lg px-2 py-1"
+                                value={setInterval || "random"}
+                                onChange={(e) => {
+                                    if (e.target.value === "random") {
+                                        setSetInterval(null);
+                                    } else {
+                                        setSetInterval(
+                                            parseInt(e.target.value)
+                                        );
+                                    }
+                                }}
+                            >
+                                <option value="random">Random</option>
+                                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(
+                                    (interval) => (
+                                        <option key={interval} value={interval}>
+                                            {interval}
+                                        </option>
+                                    )
+                                )}
+                            </select>
+                            <div className="flex flex-col gap-1">
+                                <label
+                                    className="text-white"
+                                    htmlFor="numberOfNotesToGuess"
+                                >
+                                    Guess the note after this interval:
+                                </label>
+                                <input
+                                    type="text"
+                                    className="rounded-lg px-2 py-1"
+                                    name="note"
+                                />
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <button className="bg-gradient-to-t  font-semibold text-white px-4 py-2 rounded-lg from-red-800 to-red-600">
+                                Submit
+                            </button>
+                        </div>
+                    </form>
                 </div>
             );
         }

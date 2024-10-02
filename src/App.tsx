@@ -55,6 +55,9 @@ function App() {
                         >
                             <option value="place">Place notes</option>
                             <option value="guess">Guess notes</option>
+                            <option value="interval1">
+                                Guess the note from interval
+                            </option>
                         </select>
                     </div>
                 </div>
