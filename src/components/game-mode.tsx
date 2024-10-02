@@ -7,7 +7,19 @@ import {
     NUM_OF_STRINGS,
     useGuitarState,
 } from "../utils/piano-utils";
-import { FaRandom } from "react-icons/fa";
+import { FaPlay, FaRandom } from "react-icons/fa";
+
+const audioContext = new AudioContext();
+
+const playNote = (randomNote: Note | null) => {
+    if (!randomNote) return;
+    const oscillator = audioContext.createOscillator();
+    const freq = getNoteFrequency(randomNote, 4);
+    oscillator.frequency.setValueAtTime(freq, audioContext.currentTime);
+    oscillator.connect(audioContext.destination);
+    oscillator.start();
+    oscillator.stop(audioContext.currentTime + 0.5);
+};
 
 export function GameMode() {
     const {
@@ -30,8 +42,17 @@ export function GameMode() {
     const handleSelectRandomFretAndString = () => {
         const newNotes: GuitarNote[] = [];
         for (let i = 0; i < numberOfNotesToGuess; i++) {
-            const fret = Math.floor(Math.random() * NUM_OF_FRETS);
-            const string = Math.floor(Math.random() * NUM_OF_STRINGS);
+            let fret;
+            const randomPercentage = Math.random();
+            if (randomPercentage < 0.4) {
+                fret = Math.floor(Math.random() * 6) + 1; // Frets 1 to 6
+            } else if (randomPercentage < 0.8) {
+                fret = Math.floor(Math.random() * 4) + 7; // Frets 7 to 10
+            } else {
+                fret = Math.floor(Math.random() * (NUM_OF_FRETS - 10)) + 11; // Frets 11 to NUM_OF_FRETS
+            }
+            fret -= 1;
+            const string = Math.floor(Math.random() * NUM_OF_STRINGS) + 1;
             newNotes.push({ fret, string });
         }
         setNotesToGuess(newNotes);
@@ -66,6 +87,7 @@ export function GameMode() {
                 );
                 setNotes(freqs);
             };
+
             return (
                 <div className="flex flex-col items-center gap-2">
                     <p
@@ -85,11 +107,19 @@ export function GameMode() {
                     <div className="flex gap-2">
                         <button
                             className="bg-gradient-to-t from-red-900 to-red-700 font-semibold text-white px-4 py-2 rounded-lg"
+                            onClick={() => playNote(noteBeingGuessed)}
+                        >
+                            Play note
+                            <FaPlay className="inline-block ml-2" />
+                        </button>
+                        <button
+                            className="bg-gradient-to-t from-red-900 to-red-700 font-semibold text-white px-4 py-2 rounded-lg"
                             onClick={handleSelectRandomNote}
                         >
                             New note
                             <FaRandom className="inline-block ml-2" />
                         </button>
+
                         <button
                             style={{
                                 background:

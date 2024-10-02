@@ -15,6 +15,15 @@ export enum Note {
   B = "b",
 }
 
+/**
+ * Earlier frets are wider than later frets.
+ * @param fret number between 1 and NUM_OF_FRETS
+ * @returns number between 0 and 1
+ */
+export function getFretWidth(fret: number) {
+  return Math.max(Math.pow(1 - fret / NUM_OF_FRETS, 2), 0.3);
+}
+
 export const NOTES = {
   [Note.C]: 16.35,
   [Note.CSharp]: 17.32,
@@ -147,7 +156,7 @@ type GuitarStateStore = {
 };
 
 export const useGuitarStore = create<GuitarStateStore>((set) => ({
-  gameMode: "place",
+  gameMode: "guess",
   setGameMode: (mode) => set({ gameMode: mode }),
   notes: [],
   notesToGuess: [],

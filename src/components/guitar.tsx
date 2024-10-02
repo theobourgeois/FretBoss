@@ -1,6 +1,7 @@
 import { useState } from "react";
 import {
     DOTTED_FRETS,
+    getFretWidth,
     getNoteFromFrequency,
     getNoteFromFretAndString,
     NUM_OF_FRETS,
@@ -197,7 +198,7 @@ export function Guitar() {
                     {Array.from({ length: NUM_OF_FRETS }, (_, fret) => (
                         <div
                             style={{
-                                width: `${100 / NUM_OF_FRETS}%`,
+                                width: `${getFretWidth(fret) * 100}%`,
                             }}
                             key={fret}
                             className="h-full flex flex-col-reverse relative"
